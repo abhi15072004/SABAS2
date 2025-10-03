@@ -16,10 +16,13 @@ const SchoolForm = () => {
   const [marker, setMarker] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
 
+  // Base API URL from .env
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   // Fetch schools from backend
   const fetchSchools = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/school");
+      const res = await fetch(`${API_BASE_URL}/api/school`);
       const data = await res.json();
       setSchools(data);
     } catch (err) {
@@ -114,8 +117,8 @@ const SchoolForm = () => {
     try {
       const method = school._id ? "PUT" : "POST";
       const url = school._id
-        ? `http://localhost:5000/api/school/${school.code}`
-        : "http://localhost:5000/api/school";
+        ? `${API_BASE_URL}/api/school/${school.code}`
+        : `${API_BASE_URL}/api/school`;
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -135,7 +138,7 @@ const SchoolForm = () => {
   const handleDelete = async (code) => {
     if (!window.confirm("Are you sure to delete?")) return;
     try {
-      await fetch(`http://localhost:5000/api/school/${code}`, { method: "DELETE" });
+      await fetch(`${API_BASE_URL}/api/school/${code}`, { method: "DELETE" });
       fetchSchools();
     } catch (err) {
       alert("Error: " + err.message);

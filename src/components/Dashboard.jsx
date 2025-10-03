@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { FaUserCircle, FaBusAlt, FaUsers, FaUserTie, FaChild } from 'react-icons/fa';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const Dashboard = () => {
   const { logout, user } = useAuth();
@@ -21,15 +23,13 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      // Simultaneously call all APIs
       const [driversRes, studentsRes, routesRes, busesRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/drivers'),
-        axios.get('http://localhost:5000/api/students'),
-        axios.get('http://localhost:5000/api/routes'),
-        axios.get('http://localhost:5000/api/buses'),
+        axios.get(`${API_URL}/api/drivers`),
+        axios.get(`${API_URL}/api/students`),
+        axios.get(`${API_URL}/api/routes`),
+        axios.get(`${API_URL}/api/buses`),
       ]);
 
-      // Extract counts considering response formats
       const driversCount = Array.isArray(driversRes.data) ? driversRes.data.length : driversRes.data.data?.length || 0;
       const studentsCount = Array.isArray(studentsRes.data) ? studentsRes.data.length : studentsRes.data.data?.length || 0;
       const routesCount = Array.isArray(routesRes.data) ? routesRes.data.length : routesRes.data.data?.length || 0;
@@ -111,7 +111,7 @@ const Dashboard = () => {
               <b>Manage Students</b>
             </NavLink>
             <NavLink
-              to="/dashboard/parents"
+              to="/dashboard/routes"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg font-medium transition ${isActive ? 'bg-orange-500 text-white shadow' : 'text-gray-700 hover:bg-orange-100'}`
               }

@@ -3,6 +3,9 @@ import axios from "axios";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+// Use environment variable for backend
+const API_URL = process.env.REACT_APP_API_URL;
+
 const DriverManagement = () => {
   const [drivers, setDrivers] = useState([]);
   const [formData, setFormData] = useState({ name: "", licenseNo: "", mobileNo: "", assignedBus: "", latitude: "", longitude: "" });
@@ -23,7 +26,7 @@ const DriverManagement = () => {
   }, [map]);
 
   const fetchDrivers = async () => {
-    const res = await axios.get("http://localhost:5000/api/drivers");
+    const res = await axios.get(`${API_URL}/api/drivers`);
     setDrivers(res.data.data || []);
   };
 
@@ -31,8 +34,8 @@ const DriverManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editId) await axios.put(`http://localhost:5000/api/drivers/${editId}`, formData);
-    else await axios.post("http://localhost:5000/api/drivers", formData);
+    if (editId) await axios.put(`${API_URL}/api/drivers/${editId}`, formData);
+    else await axios.post(`${API_URL}/api/drivers`, formData);
     setFormData({ name: "", licenseNo: "", mobileNo: "", assignedBus: "", latitude: "", longitude: "" });
     setEditId(null);
     fetchDrivers();
@@ -45,7 +48,7 @@ const DriverManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/drivers/${id}`);
+    await axios.delete(`${API_URL}/api/drivers/${id}`);
     fetchDrivers();
   };
 

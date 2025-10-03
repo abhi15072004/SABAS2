@@ -15,6 +15,9 @@ export default function StudentManagement() {
   const [availableBuses, setAvailableBuses] = useState([]);
   const [availableDrivers, setAvailableDrivers] = useState([]);
 
+  // Base API URL from .env
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   // Fetch students, buses, and drivers from backend on component mount
   useEffect(() => {
     fetchStudents();
@@ -24,7 +27,7 @@ export default function StudentManagement() {
 
   const fetchStudents = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/students"); // Your API endpoint
+      const res = await axios.get(`${API_BASE_URL}/api/students`); // Updated API URL
       setStudents(res.data.data || []);
     } catch (err) {
       console.error("Error fetching students", err);
@@ -33,7 +36,7 @@ export default function StudentManagement() {
 
   const fetchBuses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/buses");
+      const res = await axios.get(`${API_BASE_URL}/api/buses`);
       setAvailableBuses(res.data.data || []);
     } catch (err) {
       console.error("Error fetching buses", err);
@@ -42,7 +45,7 @@ export default function StudentManagement() {
 
   const fetchDrivers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/drivers");
+      const res = await axios.get(`${API_BASE_URL}/api/drivers`);
       setAvailableDrivers(res.data.data || []);
     } catch (err) {
       console.error("Error fetching drivers", err);
@@ -58,10 +61,10 @@ export default function StudentManagement() {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/students/${editingId}`, newStudent);
+        await axios.put(`${API_BASE_URL}/api/students/${editingId}`, newStudent);
         setEditingId(null);
       } else {
-        await axios.post("http://localhost:5000/api/students", newStudent);
+        await axios.post(`${API_BASE_URL}/api/students`, newStudent);
       }
       setNewStudent({ name: "", address: "", assignedBus: "", assignedDriver: "" });
       fetchStudents();
@@ -77,7 +80,7 @@ export default function StudentManagement() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/students/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/students/${id}`);
       fetchStudents();
     } catch (err) {
       console.error("Error deleting student", err);

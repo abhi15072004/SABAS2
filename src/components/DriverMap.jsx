@@ -3,7 +3,9 @@ import L from "leaflet";
 import { io } from "socket.io-client";
 import "leaflet/dist/leaflet.css";
 
-const socket = io("http://localhost:5000");
+// Use environment variable for backend
+const SOCKET_URL = process.env.REACT_APP_API_URL;
+const socket = io(SOCKET_URL);
 
 const DriverMap = ({ drivers }) => {
   const [map, setMap] = useState(null);
@@ -27,7 +29,7 @@ const DriverMap = ({ drivers }) => {
         markers[driverId].setLatLng([latitude, longitude]);
       } else {
         const busIcon = L.icon({
-          iconUrl: "/bus-icon.png", // small bus image in public folder
+          iconUrl: "/bus-icon.png",
           iconSize: [32, 32],
         });
         const markerInstance = L.marker([latitude, longitude], { icon: busIcon }).addTo(map);
