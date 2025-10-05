@@ -17,24 +17,23 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Base API URL from .env
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
       let data = {};
-      try {
-        data = await res.json();
-      } catch {
-        data = {};
-      }
+      try { data = await res.json(); } catch { data = {}; }
 
       if (!res.ok) {
         setError(data.message || 'Login failed');
@@ -45,11 +44,8 @@ const Login = () => {
       localStorage.setItem('token', data.token);
       contextLogin(data.user, data.token);
 
-      if (data.user.role === 'admin') {
-        navigate('/dashboard');
-      } else {
-        navigate('/');
-      }
+      if (data.user.role === 'admin') navigate('/dashboard');
+      else navigate('/');
     } catch (err) {
       setError('Server error. Please try again later.');
     } finally {
