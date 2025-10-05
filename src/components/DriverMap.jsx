@@ -3,7 +3,7 @@ import L from "leaflet";
 import { io } from "socket.io-client";
 import "leaflet/dist/leaflet.css";
 
-const socket = io("http://localhost:5000");
+const socket = io(`${import.meta.env.VITE_TUNNEL_ADDRESS}`);
 
 const DriverMap = ({ drivers }) => {
   const [map, setMap] = useState(null);

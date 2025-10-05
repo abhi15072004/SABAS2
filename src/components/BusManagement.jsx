@@ -18,7 +18,7 @@ const BusManagement = () => {
 
   const fetchBuses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/buses");
+      const res = await axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses`);
       setBuses(res.data.data || []);
     } catch (err) {
       console.error("Error fetching buses", err);
@@ -34,9 +34,9 @@ const BusManagement = () => {
 
     try {
       if (editId) {
-        await axios.put(`http://localhost:5000/api/buses/${editId}`, formData);
+        await axios.put(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses/${editId}`, formData);
       } else {
-        await axios.post("http://localhost:5000/api/buses", formData);
+        await axios.post(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses`, formData);
       }
       setFormData({
         busNumber: "",
@@ -63,7 +63,7 @@ const BusManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/buses/${id}`);
+      await axios.delete(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses/${id}`);
       fetchBuses();
     } catch (err) {
       console.error("Error deleting bus", err);

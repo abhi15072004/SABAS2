@@ -23,10 +23,10 @@ const Dashboard = () => {
     try {
       // Simultaneously call all APIs
       const [driversRes, studentsRes, routesRes, busesRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/drivers'),
-        axios.get('http://localhost:5000/api/students'),
-        axios.get('http://localhost:5000/api/routes'),
-        axios.get('http://localhost:5000/api/buses'),
+        axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/drivers`),
+        axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/students`),
+        axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/routes`),
+        axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses`),
       ]);
 
       // Extract counts considering response formats
@@ -55,7 +55,7 @@ const Dashboard = () => {
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
       {/* Top Bar */}
       <div className="w-full flex justify-between items-center px-6 py-3 shadow-md bg-gradient-to-r from-amber-500 to-orange-400 text-white">
-        <h1 className="text-xl font-bold tracking-wide">BabyBus Admin Dashboard</h1>
+        <h1 className="text-xl font-bold tracking-wide">SABAS Admin Dashboard</h1>
         <div className="relative">
           <button
             onClick={() => setMenuOpen(!menuOpen)}

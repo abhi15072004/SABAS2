@@ -23,7 +23,7 @@ const DriverManagement = () => {
   }, [map]);
 
   const fetchDrivers = async () => {
-    const res = await axios.get("http://localhost:5000/api/drivers");
+    const res = await axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/drivers`);
     setDrivers(res.data.data || []);
   };
 
@@ -31,8 +31,8 @@ const DriverManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editId) await axios.put(`http://localhost:5000/api/drivers/${editId}`, formData);
-    else await axios.post("http://localhost:5000/api/drivers", formData);
+    if (editId) await axios.put(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/drivers/${editId}`, formData);
+    else await axios.post(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/drivers`, formData);
     setFormData({ name: "", licenseNo: "", mobileNo: "", assignedBus: "", latitude: "", longitude: "" });
     setEditId(null);
     fetchDrivers();
@@ -45,22 +45,54 @@ const DriverManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/drivers/${id}`);
+    await axios.delete(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/drivers/${id}`);
     fetchDrivers();
   };
 
-  const showDriverLocation = (driver) => {
+  const showDriverLocation = async (driver) => {
     if (!map) return;
-    const lat = driver.latitude || 28.6139;
-    const lng = driver.longitude || 77.209;
-    map.setView([lat, lng], 14);
 
-    if (marker) marker.setLatLng([lat, lng]);
-    else {
-      const markerInstance = L.marker([lat, lng]).addTo(map);
-      setMarker(markerInstance);
+    const busId = driver.assignedBus;
+    if (!busId) {
+      console.warn('Driver has no assigned bus');
+      return;
     }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/location/get-location?bus_id=${busId}`);
+      const text = await response.text();  // read raw response
+      //console.log('Raw response:', text);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error('Response is not valid JSON');
+        return;
+      }
+
+      if (data.status !== 'success') {
+        console.warn('Could not get location:', data.error);
+        return;
+      }
+
+      const location = data.location;
+      const lat = location.latitude || 28.6139;
+      const lng = location.longitude || 77.209;
+
+      if (marker) marker.setLatLng([lat, lng]);
+      else {
+        const markerInstance = L.marker([lat, lng]).addTo(map);
+        setMarker(markerInstance);
+      }
+
+      map.setView([lat, lng], 14);
+    } catch (err) {
+      console.error('Error fetching driver location:', err);
+    }
+
   };
+
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

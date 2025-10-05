@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,9 +62,9 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded-lg shadow-xl">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        {role === 'admin' ? 'School Admin Login' : 'Login to BabyBus'}
+    <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded-lg shadow-xl transition-transform transform hover:scale-105 hover:shadow-2xl">
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800 animate-pulse bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+        {role === 'admin' ? 'School Admin Login' : 'Login To SABAS Portal'}
       </h2>
       {error && <p className="mb-4 text-red-500 text-center">{error}</p>}
 
@@ -91,13 +92,19 @@ const Login = () => {
             <FaLock className="text-gray-400" />
           </div>
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full pl-10 p-3 rounded-md bg-gray-50 text-gray-800 border border-gray-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+            className="w-full pl-10 pr-10 p-3 rounded-md bg-gray-50 text-gray-800 border border-gray-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
           />
+          <div 
+            className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash className="text-gray-500"/> : <FaEye className="text-gray-500"/>}
+          </div>
         </div>
 
         <div className="flex justify-end">

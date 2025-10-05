@@ -19,7 +19,7 @@ const SchoolForm = () => {
   // Fetch schools from backend
   const fetchSchools = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/school");
+      const res = await fetch(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/school`);
       const data = await res.json();
       setSchools(data);
     } catch (err) {
@@ -114,8 +114,8 @@ const SchoolForm = () => {
     try {
       const method = school._id ? "PUT" : "POST";
       const url = school._id
-        ? `http://localhost:5000/api/school/${school.code}`
-        : "http://localhost:5000/api/school";
+        ? `${import.meta.env.VITE_TUNNEL_ADDRESS}/api/school/${school.code}`
+        : `${import.meta.env.VITE_TUNNEL_ADDRESS}/api/school`;
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -135,7 +135,7 @@ const SchoolForm = () => {
   const handleDelete = async (code) => {
     if (!window.confirm("Are you sure to delete?")) return;
     try {
-      await fetch(`http://localhost:5000/api/school/${code}`, { method: "DELETE" });
+      await fetch(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/school/${code}`, { method: "DELETE" });
       fetchSchools();
     } catch (err) {
       alert("Error: " + err.message);
@@ -227,7 +227,7 @@ const SchoolForm = () => {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(s.code)}
+                    onClick={() => handleDelete(s._id)}
                     className="bg-red-500 text-white px-2 py-1 rounded"
                   >
                     <FaTrash />
