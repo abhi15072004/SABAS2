@@ -1,59 +1,96 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { io } from "socket.io-client";
 import "leaflet/dist/leaflet.css";
 
-const socket = io("http://localhost:5000");
+// Connect to backend Socket.IO server
+const socket = io(`${import.meta.env.VITE_TUNNEL_ADDRESS}`, {
+  transports: ["websocket"], // ensures stable real-time updates
+  reconnection: true,
+});
 
 const DriverMap = ({ drivers }) => {
-  const [map, setMap] = useState(null);
-  const [markers, setMarkers] = useState({});
+  const mapRef = useRef(null);          // store Leaflet map instance
+  const markersRef = useRef({});        // store markers for each driver
+  const [isMapReady, setIsMapReady] = useState(false);
 
+  // Initialize map once
   useEffect(() => {
-    if (!map) {
-      const mapInstance = L.map("driverMap").setView([28.6139, 77.209], 12);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap contributors",
-      }).addTo(mapInstance);
-      setMap(mapInstance);
-    }
+    if (mapRef.current) return; // prevent reinit
 
-    // Listen to real-time location updates
-    socket.on("locationUpdated", (data) => {
-      if (!map) return;
-      const { driverId, latitude, longitude } = data;
+    const map = L.map("driverMap").setView([28.6139, 77.209], 12);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
 
-      if (markers[driverId]) {
-        markers[driverId].setLatLng([latitude, longitude]);
-      } else {
-        const busIcon = L.icon({
-          iconUrl: "/bus-icon.png", // small bus image in public folder
-          iconSize: [32, 32],
-        });
-        const markerInstance = L.marker([latitude, longitude], { icon: busIcon }).addTo(map);
-        setMarkers((prev) => ({ ...prev, [driverId]: markerInstance }));
-      }
+    mapRef.current = map;
+    setIsMapReady(true);
+  }, []);
+
+  // Add initial driver markers when map is ready
+  useEffect(() => {
+    if (!isMapReady || !mapRef.current) return;
+
+    drivers.forEach((d) => {
+      if (!d.latitude || !d.longitude) return;
+      if (markersRef.current[d._id]) return; // skip if already added
+
+      const busIcon = L.icon({
+        iconUrl: "/bus-icon.png",
+        iconSize: [32, 32],
+      });
+
+      const marker = L.marker([d.latitude, d.longitude], { icon: busIcon })
+        .addTo(mapRef.current)
+        .bindPopup(`<b>${d.name || "Driver"}</b>`);
+
+      markersRef.current[d._id] = marker;
     });
+  }, [drivers, isMapReady]);
 
-    return () => socket.off("locationUpdated");
-  }, [map, markers]);
-
-  // Initial driver positions
+  // Listen for live location updates via socket
   useEffect(() => {
-    if (!map) return;
-    drivers.forEach(d => {
-      if (d.latitude && d.longitude && !markers[d._id]) {
+    if (!isMapReady || !mapRef.current) return;
+
+    const handleLocationUpdate = ({ driverId, latitude, longitude }) => {
+      if (!latitude || !longitude) return;
+
+      const existingMarker = markersRef.current[driverId];
+
+      if (existingMarker) {
+        // Update position
+        existingMarker.setLatLng([latitude, longitude]);
+      } else {
+        // Create new marker if not found
         const busIcon = L.icon({
           iconUrl: "/bus-icon.png",
           iconSize: [32, 32],
         });
-        const markerInstance = L.marker([d.latitude, d.longitude], { icon: busIcon }).addTo(map);
-        setMarkers((prev) => ({ ...prev, [d._id]: markerInstance }));
-      }
-    });
-  }, [drivers, map]);
 
-  return <div id="driverMap" className="h-[500px] w-full rounded shadow"></div>;
+        const marker = L.marker([latitude, longitude], { icon: busIcon })
+          .addTo(mapRef.current)
+          .bindPopup(`<b>Driver ${driverId}</b>`);
+
+        markersRef.current[driverId] = marker;
+      }
+    };
+
+    socket.on("locationUpdated", handleLocationUpdate);
+    console.log('Received IO')
+
+    // Cleanup on unmount
+    return () => {
+      socket.off("locationUpdated", handleLocationUpdate);
+    };
+  }, [isMapReady]);
+
+  return (
+    <div
+      id="driverMap"
+      className="h-[500px] w-full rounded shadow"
+      style={{ zIndex: 0 }}
+    ></div>
+  );
 };
 
 export default DriverMap;

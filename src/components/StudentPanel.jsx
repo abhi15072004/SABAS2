@@ -214,7 +214,7 @@ const StudentPanel = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(student.id)}
+                        onClick={() => handleDelete(student._id)}
                         className="text-red-500 hover:text-red-400 font-semibold"
                         aria-label={`Delete ${student.name}`}
                       >

@@ -24,7 +24,7 @@ export default function StudentManagement() {
 
   const fetchStudents = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/students"); // Your API endpoint
+      const res = await axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/students`); // Your API endpoint
       setStudents(res.data.data || []);
     } catch (err) {
       console.error("Error fetching students", err);
@@ -33,7 +33,7 @@ export default function StudentManagement() {
 
   const fetchBuses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/buses");
+      const res = await axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses`);
       setAvailableBuses(res.data.data || []);
     } catch (err) {
       console.error("Error fetching buses", err);
@@ -42,7 +42,7 @@ export default function StudentManagement() {
 
   const fetchDrivers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/drivers");
+      const res = await axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/drivers`);
       setAvailableDrivers(res.data.data || []);
     } catch (err) {
       console.error("Error fetching drivers", err);
@@ -58,10 +58,10 @@ export default function StudentManagement() {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/students/${editingId}`, newStudent);
+        await axios.put(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/students/${editingId}`, newStudent);
         setEditingId(null);
       } else {
-        await axios.post("http://localhost:5000/api/students", newStudent);
+        await axios.post(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/students`, newStudent);
       }
       setNewStudent({ name: "", address: "", assignedBus: "", assignedDriver: "" });
       fetchStudents();
@@ -77,7 +77,7 @@ export default function StudentManagement() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/students/${id}`);
+      await axios.delete(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/students/${id}`);
       fetchStudents();
     } catch (err) {
       console.error("Error deleting student", err);
@@ -85,11 +85,11 @@ export default function StudentManagement() {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold text-yellow-400 mb-6">Manage Students</h2>
+    <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+      <h2 className="text-2xl font-bold text-orange-600 mb-6">Manage Students</h2>
 
       {/* Add/Edit Form */}
-      <div className="bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
         <div className="grid md:grid-cols-2 gap-4">
           <input
             type="text"
@@ -97,7 +97,7 @@ export default function StudentManagement() {
             placeholder="Student Name"
             value={newStudent.name}
             onChange={handleInputChange}
-            className="p-2 rounded bg-gray-700 text-white"
+            className="p-2 rounded border border-gray-300 bg-white text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none placeholder:text-gray-500"
           />
           <input
             type="text"
@@ -105,13 +105,13 @@ export default function StudentManagement() {
             placeholder="Address"
             value={newStudent.address}
             onChange={handleInputChange}
-            className="p-2 rounded bg-gray-700 text-white"
+            className="p-2 rounded border border-gray-300 bg-white text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none placeholder:text-gray-500"
           />
           <select
             name="assignedBus"
             value={newStudent.assignedBus}
             onChange={handleInputChange}
-            className="p-2 rounded bg-gray-700 text-white"
+            className="p-2 rounded border border-gray-300 bg-white text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
           >
             <option value="">Assign Bus</option>
             {availableBuses.map((bus) => (
@@ -125,7 +125,7 @@ export default function StudentManagement() {
             name="assignedDriver"
             value={newStudent.assignedDriver}
             onChange={handleInputChange}
-            className="p-2 rounded bg-gray-700 text-white"
+            className="p-2 rounded border border-gray-300 bg-white text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
           >
             <option value="">Assign Driver</option>
             {availableDrivers.map((driver) => (
@@ -137,7 +137,7 @@ export default function StudentManagement() {
         </div>
         <button
           onClick={handleAddOrUpdate}
-          className="mt-4 px-4 py-2 bg-yellow-500 text-black font-semibold rounded hover:bg-yellow-400 flex items-center"
+          className="mt-4 px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-400 flex items-center transition"
         >
           <FaPlus className="mr-2" />
           {editingId ? "Update Student" : "Add Student"}
@@ -146,8 +146,8 @@ export default function StudentManagement() {
 
       {/* Students Table */}
       <div className="overflow-x-auto">
-        <table className="w-full border border-gray-700 rounded-lg overflow-hidden">
-          <thead className="bg-gray-700 text-yellow-400">
+        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+          <thead className="bg-gray-100 text-gray-900">
             <tr>
               <th className="p-3 text-left">Name</th>
               <th className="p-3 text-left">Address</th>
@@ -160,22 +160,22 @@ export default function StudentManagement() {
             {students.map((student) => (
               <tr
                 key={student.id}
-                className="border-b border-gray-700 hover:bg-gray-800"
+                className="border-b border-gray-200 hover:bg-orange-50 transition-colors duration-200"
               >
-                <td className="p-3">{student.name}</td>
-                <td className="p-3">{student.address}</td>
-                <td className="p-3">{student.assignedBus}</td>
-                <td className="p-3">{student.assignedDriver}</td>
+                <td className="p-3 text-gray-900">{student.name}</td>
+                <td className="p-3 text-gray-900">{student.address}</td>
+                <td className="p-3 text-gray-900">{student.assignedBus}</td>
+                <td className="p-3 text-gray-900">{student.assignedDriver}</td>
                 <td className="p-3 flex justify-center gap-2">
                   <button
                     onClick={() => handleEdit(student)}
-                    className="px-3 py-1 bg-blue-500 rounded hover:bg-blue-400"
+                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-400 transition"
                   >
                     <FaEdit />
                   </button>
                   <button
-                    onClick={() => handleDelete(student.id)}
-                    className="px-3 py-1 bg-red-500 rounded hover:bg-red-400"
+                    onClick={() => handleDelete(student._id)}
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-400 transition"
                   >
                     <FaTrash />
                   </button>
@@ -184,7 +184,7 @@ export default function StudentManagement() {
             ))}
             {students.length === 0 && (
               <tr>
-                <td colSpan="5" className="text-center p-4 text-gray-400">
+                <td colSpan="5" className="text-center p-4 text-gray-500">
                   No students found.
                 </td>
               </tr>

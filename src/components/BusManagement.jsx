@@ -7,21 +7,33 @@ const BusManagement = () => {
     busNumber: "",
     capacity: "",
     routeFrom: "",
-    routeTo: "",
+    assignedDriver: "",
   });
   const [editId, setEditId] = useState(null);
+
+  const [availableDrivers, setAvailableDrivers] = useState([]);
 
   // Fetch buses on mount
   useEffect(() => {
     fetchBuses();
+    fetchDrivers();
   }, []);
 
   const fetchBuses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/buses");
+      const res = await axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses`);
       setBuses(res.data.data || []);
     } catch (err) {
       console.error("Error fetching buses", err);
+    }
+  };
+
+  const fetchDrivers = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/drivers`);
+      setAvailableDrivers(res.data.data || []);
+    } catch (err) {
+      console.error("Error fetching drivers", err);
     }
   };
 
@@ -34,15 +46,15 @@ const BusManagement = () => {
 
     try {
       if (editId) {
-        await axios.put(`http://localhost:5000/api/buses/${editId}`, formData);
+        await axios.put(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses/${editId}`, formData);
       } else {
-        await axios.post("http://localhost:5000/api/buses", formData);
+        await axios.post(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses`, formData);
       }
       setFormData({
         busNumber: "",
         capacity: "",
         routeFrom: "",
-        routeTo: "",
+        assignedDriver: "",
       });
       setEditId(null);
       fetchBuses();
@@ -56,14 +68,14 @@ const BusManagement = () => {
       busNumber: bus.busNumber,
       capacity: bus.capacity,
       routeFrom: bus.routeFrom,
-      routeTo: bus.routeTo,
+      assignedDriver: bus.assignedDriver,
     });
     setEditId(bus._id);
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/buses/${id}`);
+      await axios.delete(`${import.meta.env.VITE_TUNNEL_ADDRESS}/api/buses/${id}`);
       fetchBuses();
     } catch (err) {
       console.error("Error deleting bus", err);
@@ -100,21 +112,41 @@ const BusManagement = () => {
         <input
           type="text"
           name="routeFrom"
-          placeholder="Route From"
+          placeholder="Route Number and Name"
           value={formData.routeFrom}
           onChange={handleChange}
           className="p-3 border rounded-lg"
           required
         />
-        <input
+        {/* <input
           type="text"
-          name="routeTo"
-          placeholder="Route To"
-          value={formData.routeTo}
+          name="assignedDriver"
+          placeholder="Assigned Driver"
+          value={formData.assignedDriver}
           onChange={handleChange}
           className="p-3 border rounded-lg"
           required
-        />
+        /> */}
+
+        <div className="relative">
+          <select
+            name="assignedDriver"
+            value={formData.assignedDriver}
+            onChange={handleChange}
+            className="p-3 border rounded-lg bg-white text-gray-900 appearance-none w-full"
+          >
+            <option value="">Assign Driver</option>
+            {availableDrivers.map((driver) => (
+              <option key={driver._id} value={driver.name}>
+                {driver.name}
+              </option>
+            ))}
+          </select>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+            ▼
+          </span>
+        </div>
+
 
         <button
           type="submit"
@@ -130,8 +162,8 @@ const BusManagement = () => {
           <tr>
             <th className="p-3 border">Bus Number</th>
             <th className="p-3 border">Capacity</th>
-            <th className="p-3 border">Route From</th>
-            <th className="p-3 border">Route To</th>
+            <th className="p-3 border">Route Name</th>
+            <th className="p-3 border">Assigned Driver</th>
             <th className="p-3 border">Actions</th>
           </tr>
         </thead>
@@ -142,7 +174,7 @@ const BusManagement = () => {
                 <td className="p-3 border">{bus.busNumber}</td>
                 <td className="p-3 border">{bus.capacity}</td>
                 <td className="p-3 border">{bus.routeFrom}</td>
-                <td className="p-3 border">{bus.routeTo}</td>
+                <td className="p-3 border">{bus.assignedDriver}</td>
                 <td className="p-3 border space-x-2">
                   <button
                     onClick={() => handleEdit(bus)}

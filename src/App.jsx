@@ -18,6 +18,7 @@ import BusManagement from './components/BusManagement';
 import DriverManagement from './components/DriverManagement';
 import StudentManagement from './components/StudentManagement';
 import SchoolForm from './components/SchoolForm'; // For parents or school info
+import Profile from './components/Profile';
 
 // Auth Context
 import { useAuth } from './context/AuthContext';
@@ -35,15 +36,7 @@ function LandingPage() {
   );
 }
 
-// Dashboard Home Component
-function DashboardHome() {
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Welcome to Dashboard</h2>
-      <p className="text-gray-600">Select an option from the sidebar to get started.</p>
-    </div>
-  );
-}
+import DashboardHome from './components/DashboardHome';
 
 // App Content with Conditional Navbar
 function AppContent() {
@@ -61,7 +54,7 @@ function AppContent() {
           {/* Public Routes */}
           <Route
             path="/"
-            element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />}
+            element={<LandingPage />}
           />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -80,6 +73,7 @@ function AppContent() {
             <Route path="drivers" element={<DriverManagement />} />
             <Route path="students" element={<StudentManagement />} />
             <Route path="parents" element={<SchoolForm />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Catch-all for undefined routes */}
